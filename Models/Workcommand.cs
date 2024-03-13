@@ -101,5 +101,13 @@ namespace CopaCmd.Models
         /// 計算過程
         /// </summary>
         public string? CalculateNote { get; set; }
+        /// <summary>
+        /// ERP通知單號
+        /// </summary>
+        public string? ErpTzNo { get; set; }
+        /// <summary>
+        /// ERP通知單日期
+        /// </summary>
+        public DateTime? ErpTzDd { get; set; }
     }
 }

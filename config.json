@@ -1,0 +1,12 @@
+{
+  "DB_USERNAME_PMS": "sa",
+  "DB_PASSWORD_PMS": "htit",
+  "DB_USERNAME_ERP": "sa",
+  "DB_PASSWORD_ERP": "htit",
+  "DB_HOST_PMS": "192.168.100.253",
+  "DB_HOST_ERP": "192.168.100.253",
+  "DB_DATABASE_PMS": "copapms",
+  "DB_DATABASE_ERP": "copapms",
+  "DB_WORK_NO_TABLE_ERP": "erp_data_emu",
+  "DB_WORK_COMMAND_TABLE_ERP": "erp_data_emu_second"
+}

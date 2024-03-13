@@ -1,18 +1,27 @@
-﻿using CopaCmd.Models;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace CopaContext
+namespace CopaCmd.Models
 {
-    public partial class copapmsContext : DbContext
+    public partial class CopaContext : DbContext
     {
-        public copapmsContext(DbContextOptions<copapmsContext> options)
+        public CopaContext()
+        {
+        }
+
+        public CopaContext(DbContextOptions<CopaContext> options)
             : base(options)
         {
         }
 
         public virtual DbSet<AdjustMold> AdjustMolds { get; set; } = null!;
         public virtual DbSet<AvailableWorkNoMachine> AvailableWorkNoMachines { get; set; } = null!;
+        public virtual DbSet<ClosedMachineProductionTime> ClosedMachineProductionTimes { get; set; } = null!;
+        public virtual DbSet<ClosedTapProductionTime> ClosedTapProductionTimes { get; set; } = null!;
         public virtual DbSet<CopaWorkOrder> CopaWorkOrders { get; set; } = null!;
+        public virtual DbSet<CopaWorkOrderPowerinfo> CopaWorkOrderPowerinfos { get; set; } = null!;
         public virtual DbSet<DayPackage> DayPackages { get; set; } = null!;
         public virtual DbSet<DayPro> DayPros { get; set; } = null!;
         public virtual DbSet<DayProduct> DayProducts { get; set; } = null!;
@@ -21,6 +30,8 @@ namespace CopaContext
         public virtual DbSet<DetectionStandard> DetectionStandards { get; set; } = null!;
         public virtual DbSet<DetectionStandardSheet> DetectionStandardSheets { get; set; } = null!;
         public virtual DbSet<Employee> Employees { get; set; } = null!;
+        public virtual DbSet<ErpDataEmu> ErpDataEmus { get; set; } = null!;
+        public virtual DbSet<ErpDataEmuSecond> ErpDataEmuSeconds { get; set; } = null!;
         public virtual DbSet<Fixreason> Fixreasons { get; set; } = null!;
         public virtual DbSet<FixreasonCategory1> FixreasonCategory1s { get; set; } = null!;
         public virtual DbSet<FixreasonCategory2> FixreasonCategory2s { get; set; } = null!;
@@ -37,6 +48,10 @@ namespace CopaContext
         public virtual DbSet<MachinesCountLogBackup> MachinesCountLogBackups { get; set; } = null!;
         public virtual DbSet<Machinetype> Machinetypes { get; set; } = null!;
         public virtual DbSet<MeasuringTool> MeasuringTools { get; set; } = null!;
+        public virtual DbSet<MeterDayRecord> MeterDayRecords { get; set; } = null!;
+        public virtual DbSet<MeterParameter> MeterParameters { get; set; } = null!;
+        public virtual DbSet<MeterRecordLog> MeterRecordLogs { get; set; } = null!;
+        public virtual DbSet<MeterTable> MeterTables { get; set; } = null!;
         public virtual DbSet<Mold> Molds { get; set; } = null!;
         public virtual DbSet<MoldCategory> MoldCategories { get; set; } = null!;
         public virtual DbSet<MoldReplaceRecord> MoldReplaceRecords { get; set; } = null!;
@@ -49,12 +64,10 @@ namespace CopaContext
         public virtual DbSet<Precaution> Precautions { get; set; } = null!;
         public virtual DbSet<ProductTable> ProductTables { get; set; } = null!;
         public virtual DbSet<ShiftTable> ShiftTables { get; set; } = null!;
+        public virtual DbSet<SystemMsg> SystemMsgs { get; set; } = null!;
         public virtual DbSet<SystemParameter> SystemParameters { get; set; } = null!;
         public virtual DbSet<UserDevice> UserDevices { get; set; } = null!;
         public virtual DbSet<Vigorplclog> Vigorplclogs { get; set; } = null!;
-        public virtual DbSet<Vigorplclog2021> Vigorplclog2021s { get; set; } = null!;
-        public virtual DbSet<VigorplclogBackup> VigorplclogBackups { get; set; } = null!;
-        public virtual DbSet<VigorplclogTap> VigorplclogTaps { get; set; } = null!;
         public virtual DbSet<WorkOrder> WorkOrders { get; set; } = null!;
         public virtual DbSet<Workcommand> Workcommands { get; set; } = null!;
         public virtual DbSet<WorkcommandDetail> WorkcommandDetails { get; set; } = null!;
@@ -185,6 +198,120 @@ namespace CopaContext
                     .HasComment("工令");
             });
 
+            modelBuilder.Entity<ClosedMachineProductionTime>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToView("closed_machine_production_time");
+
+                entity.Property(e => e.Enddate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("enddate");
+
+                entity.Property(e => e.MachineId)
+                    .HasColumnType("int(11)")
+                    .HasColumnName("machine_id")
+                    .HasComment("機台代號");
+
+                entity.Property(e => e.MachineName)
+                    .HasMaxLength(10)
+                    .HasColumnName("machine_name")
+                    .HasComment("機台名稱");
+
+                entity.Property(e => e.ProductId)
+                    .HasMaxLength(50)
+                    .HasColumnName("product_id")
+                    .HasComment("產品代號");
+
+                entity.Property(e => e.ProductName)
+                    .HasMaxLength(50)
+                    .HasColumnName("product_name")
+                    .HasComment("規格");
+
+                entity.Property(e => e.ProductionTimeSec)
+                    .HasPrecision(31)
+                    .HasColumnName("production_time_sec");
+
+                entity.Property(e => e.Startdate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("startdate")
+                    .HasComment("開工時間");
+
+                entity.Property(e => e.Total)
+                    .HasColumnType("int(11)")
+                    .HasColumnName("total")
+                    .HasDefaultValueSql("'0'");
+
+                entity.Property(e => e.WorkNo)
+                    .HasMaxLength(50)
+                    .HasColumnName("work_no")
+                    .HasComment("工單");
+
+                entity.Property(e => e.WorkcommandId)
+                    .HasColumnType("int(11) unsigned")
+                    .HasColumnName("workcommand_id")
+                    .HasComment("序號");
+            });
+
+            modelBuilder.Entity<ClosedTapProductionTime>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToView("closed_tap_production_time");
+
+                entity.Property(e => e.DetailTotal)
+                    .HasColumnType("int(11)")
+                    .HasColumnName("detail_total");
+
+                entity.Property(e => e.MachineName)
+                    .HasMaxLength(10)
+                    .HasColumnName("machine_name")
+                    .HasComment("機台名稱");
+
+                entity.Property(e => e.ProductName)
+                    .HasMaxLength(50)
+                    .HasColumnName("product_name")
+                    .HasComment("規格");
+
+                entity.Property(e => e.ProductionEnddate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("production_enddate")
+                    .HasComment("結束時間");
+
+                entity.Property(e => e.ProductionStartdate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("production_startdate")
+                    .HasComment("開始時間");
+
+                entity.Property(e => e.ProductionTimeSec)
+                    .HasPrecision(31)
+                    .HasColumnName("production_time_sec");
+
+                entity.Property(e => e.Status)
+                    .HasMaxLength(255)
+                    .HasColumnName("status")
+                    .HasComment("機台狀態 關機 閒置 維修 生產");
+
+                entity.Property(e => e.Total)
+                    .HasColumnType("int(11)")
+                    .HasColumnName("total")
+                    .HasDefaultValueSql("'0'");
+
+                entity.Property(e => e.WorkEnddate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("work_enddate");
+
+                entity.Property(e => e.WorkNo)
+                    .HasMaxLength(30)
+                    .HasColumnName("work_no")
+                    .HasComment("製令編號");
+
+                entity.Property(e => e.WorkStartdate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("work_startdate")
+                    .HasComment("開工時間");
+            });
+
             modelBuilder.Entity<CopaWorkOrder>(entity =>
             {
                 entity.ToTable("copa_work_order");
@@ -304,6 +431,77 @@ namespace CopaContext
                     .HasMaxLength(30)
                     .HasColumnName("work_no_n")
                     .HasComment("合併製令編號");
+            });
+
+            modelBuilder.Entity<CopaWorkOrderPowerinfo>(entity =>
+            {
+                entity.ToTable("copa_work_order_powerinfo");
+
+                entity.Property(e => e.Id)
+                    .HasColumnType("int(11) unsigned")
+                    .HasComment("序號");
+
+                entity.Property(e => e.CreateTime)
+                    .HasColumnType("timestamp")
+                    .ValueGeneratedOnAddOrUpdate()
+                    .HasColumnName("create_time")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                    .HasComment("建立時間");
+
+                entity.Property(e => e.DetailTotalCnt)
+                    .HasColumnType("int(11)")
+                    .HasColumnName("detail_total_cnt")
+                    .HasComment("明細總生產量");
+
+                entity.Property(e => e.EndTime)
+                    .HasColumnType("datetime")
+                    .HasColumnName("end_time")
+                    .HasComment("結束時間");
+
+                entity.Property(e => e.MachineName)
+                    .HasMaxLength(20)
+                    .HasColumnName("machine_name")
+                    .HasComment("機台名稱");
+
+                entity.Property(e => e.MeterName)
+                    .HasMaxLength(20)
+                    .HasColumnName("meter_name")
+                    .HasComment("電表名稱");
+
+                entity.Property(e => e.Note)
+                    .HasMaxLength(50)
+                    .HasColumnName("note")
+                    .HasComment("備註");
+
+                entity.Property(e => e.ProductName)
+                    .HasMaxLength(20)
+                    .HasColumnName("product_name")
+                    .HasComment("產品品號");
+
+                entity.Property(e => e.StartTime)
+                    .HasColumnType("datetime")
+                    .HasColumnName("start_time")
+                    .HasComment("開始時間");
+
+                entity.Property(e => e.TotalCnt)
+                    .HasColumnType("int(11)")
+                    .HasColumnName("total_cnt")
+                    .HasComment("總生產量");
+
+                entity.Property(e => e.TotalPowerConsumption)
+                    .HasMaxLength(20)
+                    .HasColumnName("total_power_consumption")
+                    .HasComment("總秏電量");
+
+                entity.Property(e => e.TotalProductionSecs)
+                    .HasColumnType("int(11)")
+                    .HasColumnName("total_production_secs")
+                    .HasComment("總生產秒數");
+
+                entity.Property(e => e.WorkNo)
+                    .HasMaxLength(20)
+                    .HasColumnName("work_no")
+                    .HasComment("製令編號");
             });
 
             modelBuilder.Entity<DayPackage>(entity =>
@@ -690,6 +888,126 @@ namespace CopaContext
                 entity.Property(e => e.Token)
                     .HasColumnName("token")
                     .HasComment("登入令牌");
+            });
+
+            modelBuilder.Entity<ErpDataEmu>(entity =>
+            {
+                entity.ToTable("erp_data_emu");
+
+                entity.Property(e => e.Id)
+                    .HasColumnType("int(11)")
+                    .HasColumnName("id");
+
+                entity.Property(e => e.CasNo)
+                    .HasMaxLength(20)
+                    .HasColumnName("CAS_NO");
+
+                entity.Property(e => e.ClsDate).HasColumnName("CLS_DATE");
+
+                entity.Property(e => e.CusNo)
+                    .HasMaxLength(20)
+                    .HasColumnName("CUS_NO");
+
+                entity.Property(e => e.CusOsNo)
+                    .HasMaxLength(20)
+                    .HasColumnName("CUS_OS_NO");
+
+                entity.Property(e => e.MfMo001)
+                    .HasMaxLength(20)
+                    .HasColumnName("mf_mo_001");
+
+                entity.Property(e => e.MoDd).HasColumnName("MO_DD");
+
+                entity.Property(e => e.MoNo)
+                    .HasMaxLength(20)
+                    .HasColumnName("MO_NO");
+
+                entity.Property(e => e.ModifyDd).HasColumnName("MODIFY_DD");
+
+                entity.Property(e => e.ModifyMan)
+                    .HasMaxLength(50)
+                    .HasColumnName("MODIFY_MAN");
+
+                entity.Property(e => e.MrpNo)
+                    .HasMaxLength(20)
+                    .HasColumnName("MRP_NO");
+
+                entity.Property(e => e.NeedDd).HasColumnName("NEED_DD");
+
+                entity.Property(e => e.Qty)
+                    .HasColumnType("int(11)")
+                    .HasColumnName("QTY");
+
+                entity.Property(e => e.Rem)
+                    .HasMaxLength(255)
+                    .HasColumnName("REM");
+
+                entity.Property(e => e.SoNo)
+                    .HasMaxLength(20)
+                    .HasColumnName("SO_NO");
+
+                entity.Property(e => e.Spc)
+                    .HasMaxLength(50)
+                    .HasColumnName("SPC");
+
+                entity.Property(e => e.StaDd).HasColumnName("STA_DD");
+
+                entity.Property(e => e.Unit)
+                    .HasMaxLength(10)
+                    .HasColumnName("UNIT");
+            });
+
+            modelBuilder.Entity<ErpDataEmuSecond>(entity =>
+            {
+                entity.ToTable("erp_data_emu_second");
+
+                entity.Property(e => e.Id)
+                    .HasColumnType("int(11)")
+                    .HasColumnName("id");
+
+                entity.Property(e => e.Dep)
+                    .HasMaxLength(20)
+                    .HasColumnName("DEP");
+
+                entity.Property(e => e.EndDd)
+                    .HasColumnType("datetime")
+                    .HasColumnName("END_DD");
+
+                entity.Property(e => e.MoNo)
+                    .HasMaxLength(20)
+                    .HasColumnName("MO_NO");
+
+                entity.Property(e => e.ModifyDd).HasColumnName("MODIFY_DD");
+
+                entity.Property(e => e.MrpNo)
+                    .HasMaxLength(20)
+                    .HasColumnName("MRP_NO");
+
+                entity.Property(e => e.Qty)
+                    .HasColumnType("int(11)")
+                    .HasColumnName("QTY");
+
+                entity.Property(e => e.Rrem)
+                    .HasMaxLength(255)
+                    .HasColumnName("RREM");
+
+                entity.Property(e => e.StaDd)
+                    .HasColumnType("datetime")
+                    .HasColumnName("STA_DD");
+
+                entity.Property(e => e.TzDd).HasColumnName("TZ_DD");
+
+                entity.Property(e => e.TzNo)
+                    .HasMaxLength(20)
+                    .HasColumnName("TZ_NO");
+
+                entity.Property(e => e.Unit)
+                    .HasMaxLength(10)
+                    .HasColumnName("UNIT");
+
+                entity.Property(e => e.ZcNo)
+                    .HasMaxLength(20)
+                    .HasColumnName("ZC_NO");
             });
 
             modelBuilder.Entity<Fixreason>(entity =>
@@ -1511,6 +1829,264 @@ namespace CopaContext
                     .HasComment("量具編號");
             });
 
+            modelBuilder.Entity<MeterDayRecord>(entity =>
+            {
+                entity.ToTable("meter_day_record");
+
+                entity.Property(e => e.Id)
+                    .HasColumnType("int(11) unsigned")
+                    .HasColumnName("id")
+                    .HasComment("序號");
+
+                entity.Property(e => e.EndDeg)
+                    .HasMaxLength(20)
+                    .HasColumnName("end_deg")
+                    .HasComment("結束度數");
+
+                entity.Property(e => e.MachineList)
+                    .HasMaxLength(250)
+                    .HasColumnName("machine_list")
+                    .HasComment("機台列表編號");
+
+                entity.Property(e => e.MeasureDay)
+                    .HasMaxLength(10)
+                    .HasColumnName("measure_day")
+                    .HasComment("用電日期");
+
+                entity.Property(e => e.MeterNo)
+                    .HasMaxLength(20)
+                    .HasColumnName("meter_no")
+                    .HasComment("電表編號");
+
+                entity.Property(e => e.Note)
+                    .HasMaxLength(50)
+                    .HasColumnName("note")
+                    .HasComment("備註");
+
+                entity.Property(e => e.StartDeg)
+                    .HasMaxLength(20)
+                    .HasColumnName("start_deg")
+                    .HasComment("開始度數");
+
+                entity.Property(e => e.TotalDeg)
+                    .HasMaxLength(20)
+                    .HasColumnName("total_deg")
+                    .HasComment("用電度數");
+            });
+
+            modelBuilder.Entity<MeterParameter>(entity =>
+            {
+                entity.ToTable("meter_parameters");
+
+                entity.Property(e => e.Id)
+                    .HasColumnType("int(11) unsigned")
+                    .HasColumnName("id")
+                    .HasComment("序號");
+
+                entity.Property(e => e.DataType)
+                    .HasMaxLength(20)
+                    .HasColumnName("data_type")
+                    .HasComment("資料類型");
+
+                entity.Property(e => e.IsEnabled)
+                    .HasColumnName("is_enabled")
+                    .HasComment("啟用");
+
+                entity.Property(e => e.MeterNo)
+                    .HasMaxLength(20)
+                    .HasColumnName("meter_no")
+                    .HasComment("電表編號");
+
+                entity.Property(e => e.Note)
+                    .HasMaxLength(50)
+                    .HasColumnName("note")
+                    .HasComment("備註");
+
+                entity.Property(e => e.ParaFieldName)
+                    .HasMaxLength(50)
+                    .HasColumnName("para_field_name")
+                    .HasComment("參數資料對應欄位");
+
+                entity.Property(e => e.ParaName)
+                    .HasMaxLength(20)
+                    .HasColumnName("para_name")
+                    .HasComment("參數名稱");
+
+                entity.Property(e => e.ParaNo)
+                    .HasMaxLength(20)
+                    .HasColumnName("para_no")
+                    .HasComment("參數編號");
+
+                entity.Property(e => e.PlcNo)
+                    .HasMaxLength(10)
+                    .HasColumnName("plc_no")
+                    .HasComment("Plc對應編號");
+
+                entity.Property(e => e.Sign)
+                    .HasMaxLength(10)
+                    .HasColumnName("sign")
+                    .HasComment("符號");
+
+                entity.Property(e => e.Sort)
+                    .HasColumnType("int(11)")
+                    .HasColumnName("sort")
+                    .HasDefaultValueSql("'999'")
+                    .HasComment("排序");
+
+                entity.Property(e => e.Unit)
+                    .HasMaxLength(10)
+                    .HasColumnName("unit")
+                    .HasComment("單位");
+            });
+
+            modelBuilder.Entity<MeterRecordLog>(entity =>
+            {
+                entity.ToTable("meter_record_log");
+
+                entity.Property(e => e.Id)
+                    .HasColumnType("bigint(20) unsigned")
+                    .HasColumnName("id")
+                    .HasComment("序號");
+
+                entity.Property(e => e.AvgCurrent)
+                    .HasMaxLength(20)
+                    .HasColumnName("avg_current")
+                    .HasComment("平均電流");
+
+                entity.Property(e => e.AvgVoltage)
+                    .HasMaxLength(20)
+                    .HasColumnName("avg_voltage")
+                    .HasComment("平均電壓");
+
+                entity.Property(e => e.CreateTime)
+                    .HasColumnType("timestamp")
+                    .ValueGeneratedOnAddOrUpdate()
+                    .HasColumnName("create_time")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                    .HasComment("建立時間");
+
+                entity.Property(e => e.CumulativePower)
+                    .HasMaxLength(20)
+                    .HasColumnName("cumulative_power")
+                    .HasComment("累積用電量");
+
+                entity.Property(e => e.DailyAccumulatedElectricity)
+                    .HasMaxLength(20)
+                    .HasColumnName("daily_accumulated_electricity")
+                    .HasComment("日累積用電");
+
+                entity.Property(e => e.Electricity)
+                    .HasMaxLength(20)
+                    .HasColumnName("electricity")
+                    .HasComment("秏電量");
+
+                entity.Property(e => e.Frequency)
+                    .HasMaxLength(20)
+                    .HasColumnName("frequency")
+                    .HasComment("頻率");
+
+                entity.Property(e => e.MachineList)
+                    .HasMaxLength(250)
+                    .HasColumnName("machine_list")
+                    .HasComment("機台列表編號");
+
+                entity.Property(e => e.MeterNo)
+                    .HasMaxLength(20)
+                    .HasColumnName("meter_no")
+                    .HasComment("電表編號");
+
+                entity.Property(e => e.Note)
+                    .HasMaxLength(20)
+                    .HasColumnName("note")
+                    .HasComment("備註");
+
+                entity.Property(e => e.PowerFactor)
+                    .HasMaxLength(20)
+                    .HasColumnName("power_factor")
+                    .HasComment("功率因數");
+            });
+
+            modelBuilder.Entity<MeterTable>(entity =>
+            {
+                entity.ToTable("meter_table");
+
+                entity.Property(e => e.Id)
+                    .HasColumnType("int(10) unsigned")
+                    .HasColumnName("id")
+                    .HasComment("序號");
+
+                entity.Property(e => e.AvgCurrent)
+                    .HasMaxLength(20)
+                    .HasColumnName("avg_current")
+                    .HasComment("平均電流");
+
+                entity.Property(e => e.AvgVoltage)
+                    .HasMaxLength(20)
+                    .HasColumnName("avg_voltage")
+                    .HasComment("平均電壓");
+
+                entity.Property(e => e.CumulativePower)
+                    .HasMaxLength(20)
+                    .HasColumnName("cumulative_power")
+                    .HasComment("累積用電量");
+
+                entity.Property(e => e.DailyAccumulatedElectricity)
+                    .HasMaxLength(20)
+                    .HasColumnName("daily_accumulated_electricity")
+                    .HasComment("日累積用電");
+
+                entity.Property(e => e.Electricity)
+                    .HasMaxLength(20)
+                    .HasColumnName("electricity")
+                    .HasComment("秏電量");
+
+                entity.Property(e => e.Frequency)
+                    .HasMaxLength(20)
+                    .HasColumnName("frequency")
+                    .HasComment("頻率");
+
+                entity.Property(e => e.LastUpdateTime)
+                    .HasColumnType("datetime")
+                    .HasColumnName("last_update_time")
+                    .HasComment("最後更新時間");
+
+                entity.Property(e => e.MachineList)
+                    .HasMaxLength(250)
+                    .HasColumnName("machine_list")
+                    .HasComment("用電機台列表");
+
+                entity.Property(e => e.MeterName)
+                    .HasMaxLength(20)
+                    .HasColumnName("meter_name")
+                    .HasComment("電表名稱");
+
+                entity.Property(e => e.MeterNo)
+                    .HasMaxLength(20)
+                    .HasColumnName("meter_no")
+                    .HasComment("電表編號");
+
+                entity.Property(e => e.PlcName)
+                    .HasMaxLength(10)
+                    .HasColumnName("plc_name")
+                    .HasComment("plc代碼");
+
+                entity.Property(e => e.PowerFactor)
+                    .HasMaxLength(20)
+                    .HasColumnName("power_factor")
+                    .HasComment("功率因數");
+
+                entity.Property(e => e.Sort)
+                    .HasColumnType("tinyint(4)")
+                    .HasColumnName("sort")
+                    .HasDefaultValueSql("'99'")
+                    .HasComment("排序");
+
+                entity.Property(e => e.Status)
+                    .HasMaxLength(20)
+                    .HasColumnName("status")
+                    .HasComment("狀態");
+            });
+
             modelBuilder.Entity<Mold>(entity =>
             {
                 entity.ToTable("mold");
@@ -2233,6 +2809,43 @@ namespace CopaContext
                     .IsFixedLength();
             });
 
+            modelBuilder.Entity<SystemMsg>(entity =>
+            {
+                entity.ToTable("system_msg");
+
+                entity.Property(e => e.Id)
+                    .HasColumnType("int(11)")
+                    .HasColumnName("id")
+                    .HasComment("序號");
+
+                entity.Property(e => e.Category)
+                    .HasMaxLength(50)
+                    .HasColumnName("category")
+                    .HasComment("類別");
+
+                entity.Property(e => e.CreateTime)
+                    .HasColumnType("timestamp")
+                    .ValueGeneratedOnAddOrUpdate()
+                    .HasColumnName("createTime")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                    .HasComment("建立時間");
+
+                entity.Property(e => e.Msg)
+                    .HasMaxLength(500)
+                    .HasColumnName("msg")
+                    .HasComment("處理訊息");
+
+                entity.Property(e => e.Note)
+                    .HasMaxLength(500)
+                    .HasColumnName("note")
+                    .HasComment("備註");
+
+                entity.Property(e => e.Status)
+                    .HasMaxLength(20)
+                    .HasColumnName("status")
+                    .HasComment("狀態");
+            });
+
             modelBuilder.Entity<SystemParameter>(entity =>
             {
                 entity.ToTable("system_parameter");
@@ -2410,236 +3023,6 @@ namespace CopaContext
                     .HasComment("PLC名稱");
             });
 
-            modelBuilder.Entity<Vigorplclog2021>(entity =>
-            {
-                entity.HasNoKey();
-
-                entity.ToTable("vigorplclog_2021");
-
-                entity.Property(e => e.Createtime)
-                    .HasColumnType("datetime")
-                    .HasColumnName("createtime")
-                    .HasComment("新增時間");
-
-                entity.Property(e => e.Id)
-                    .HasColumnType("int(11)")
-                    .HasColumnName("id");
-
-                entity.Property(e => e.Mc1)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc1");
-
-                entity.Property(e => e.Mc10)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc10");
-
-                entity.Property(e => e.Mc11)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc11");
-
-                entity.Property(e => e.Mc12)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc12");
-
-                entity.Property(e => e.Mc13)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc13");
-
-                entity.Property(e => e.Mc14)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc14");
-
-                entity.Property(e => e.Mc15)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc15");
-
-                entity.Property(e => e.Mc16)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc16");
-
-                entity.Property(e => e.Mc17)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc17");
-
-                entity.Property(e => e.Mc18)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc18");
-
-                entity.Property(e => e.Mc19)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc19");
-
-                entity.Property(e => e.Mc2)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc2");
-
-                entity.Property(e => e.Mc20)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc20");
-
-                entity.Property(e => e.Mc3)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc3");
-
-                entity.Property(e => e.Mc4)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc4");
-
-                entity.Property(e => e.Mc5)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc5");
-
-                entity.Property(e => e.Mc6)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc6");
-
-                entity.Property(e => e.Mc7)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc7");
-
-                entity.Property(e => e.Mc8)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc8");
-
-                entity.Property(e => e.Mc9)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc9");
-
-                entity.Property(e => e.PlcName)
-                    .HasMaxLength(10)
-                    .HasColumnName("plc_name")
-                    .HasComment("PLC名稱");
-            });
-
-            modelBuilder.Entity<VigorplclogBackup>(entity =>
-            {
-                entity.HasNoKey();
-
-                entity.ToTable("vigorplclog_backup");
-
-                entity.Property(e => e.Createtime)
-                    .HasColumnType("datetime")
-                    .HasColumnName("createtime")
-                    .HasComment("新增時間");
-
-                entity.Property(e => e.Id)
-                    .HasColumnType("int(11)")
-                    .HasColumnName("id");
-
-                entity.Property(e => e.Mc1)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc1");
-
-                entity.Property(e => e.Mc10)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc10");
-
-                entity.Property(e => e.Mc11)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc11");
-
-                entity.Property(e => e.Mc12)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc12");
-
-                entity.Property(e => e.Mc13)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc13");
-
-                entity.Property(e => e.Mc14)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc14");
-
-                entity.Property(e => e.Mc15)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc15");
-
-                entity.Property(e => e.Mc16)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc16");
-
-                entity.Property(e => e.Mc17)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc17");
-
-                entity.Property(e => e.Mc18)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc18");
-
-                entity.Property(e => e.Mc19)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc19");
-
-                entity.Property(e => e.Mc2)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc2");
-
-                entity.Property(e => e.Mc20)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc20");
-
-                entity.Property(e => e.Mc3)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc3");
-
-                entity.Property(e => e.Mc4)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc4");
-
-                entity.Property(e => e.Mc5)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc5");
-
-                entity.Property(e => e.Mc6)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc6");
-
-                entity.Property(e => e.Mc7)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc7");
-
-                entity.Property(e => e.Mc8)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc8");
-
-                entity.Property(e => e.Mc9)
-                    .HasMaxLength(10)
-                    .HasColumnName("mc9");
-
-                entity.Property(e => e.PlcName)
-                    .HasMaxLength(10)
-                    .HasColumnName("plc_name")
-                    .HasComment("PLC名稱");
-            });
-
-            modelBuilder.Entity<VigorplclogTap>(entity =>
-            {
-                entity.ToTable("vigorplclog_tap");
-
-                entity.HasIndex(e => e.Createtime, "createtime");
-
-                entity.HasIndex(e => new { e.PlcName, e.Createtime }, "plc_name_and_createtime");
-
-                entity.Property(e => e.Id)
-                    .HasColumnType("int(11)")
-                    .HasColumnName("id");
-
-                entity.Property(e => e.Createtime)
-                    .HasColumnType("datetime")
-                    .HasColumnName("createtime")
-                    .HasComment("新增時間");
-
-                entity.Property(e => e.JsonData)
-                    .HasColumnType("json")
-                    .HasColumnName("json_data")
-                    .HasComment("PLC資料");
-
-                entity.Property(e => e.PlcName)
-                    .HasMaxLength(10)
-                    .HasColumnName("plc_name")
-                    .HasComment("PLC名稱");
-            });
-
             modelBuilder.Entity<WorkOrder>(entity =>
             {
                 entity.ToTable("work_order");
@@ -2807,6 +3190,16 @@ namespace CopaContext
                 entity.Property(e => e.Enddate)
                     .HasColumnType("datetime")
                     .HasColumnName("enddate");
+
+                entity.Property(e => e.ErpTzDd)
+                    .HasColumnType("datetime")
+                    .HasColumnName("erp_tz_dd")
+                    .HasComment("ERP通知單日期");
+
+                entity.Property(e => e.ErpTzNo)
+                    .HasMaxLength(20)
+                    .HasColumnName("erp_tz_no")
+                    .HasComment("ERP通知單號");
 
                 entity.Property(e => e.ExpectedEnddate)
                     .HasColumnType("datetime")
@@ -3181,7 +3574,6 @@ namespace CopaContext
 
                 entity.Property(e => e.UpdateTime)
                     .HasColumnType("datetime")
-                    .ValueGeneratedOnAddOrUpdate()
                     .HasColumnName("update_time")
                     .HasComment("更新時間");
 
@@ -3434,8 +3826,6 @@ namespace CopaContext
             OnModelCreatingPartial(modelBuilder);
         }
 
-        private void OnModelCreatingPartial(ModelBuilder modelBuilder)
-        {
-        }
+        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
 }
