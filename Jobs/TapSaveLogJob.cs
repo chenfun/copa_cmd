@@ -217,9 +217,16 @@ namespace CopaCmd.Jobs
                             mc.Detail.EndCnt = newDetail.StartCnt;
                             mc.Detail.OkCnt = mc.Detail.EndCnt - mc.Detail.StartCnt;
                         }
-                        db.SaveChanges();
-                        //有新增Detail，所以更新WcdId，但未更新至machine資料表
-                        mc.WcdId = newDetail.Id.ToString();
+                        try
+                        {
+                            db.SaveChanges();
+                            //有新增Detail，所以更新WcdId，但未更新至machine資料表
+                            mc.WcdId = newDetail.Id.ToString();
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Error(ex, $"換班發生錯誤,WcId=>{mc.WcdId},machineid=>{mc.MachineId},start=>{newStartTime}");
+                        }
                     }
                 }
             }
@@ -393,28 +400,31 @@ namespace CopaCmd.Jobs
                         detail = mc.Detail;
                         //若新重計數的話，需要新增一筆新的detail，並結束上筆detail
                         //目前只在早上六點會發生，PLC六點會歸零
+                        //修改六點那筆不寫入
                         if (mc.isReset)
                         {
+                            //2024-05-24 chenfun 修正
+                            //事由：六點reset的時候，不寫入新的筆數
                             //結束上筆，只記錄時間
-                            detail.Isok = 1;
-                            detail.Enddate = DateTime.Now;
+                            //detail.Isok = 1;
+                            //detail.Enddate = DateTime.Now;
 
-                            //新增一筆明細
-                            WorkcommandDetailsTap newDetail = new WorkcommandDetailsTap();
-                            newDetail.Startdate= mc.Detail.Enddate;
-                            newDetail.WorkcommandId = mc.WcId;
-                            newDetail.MachineId = mc.MachineId;
-                            newDetail.Eid1 = detail.Eid1;
-                            newDetail.StartCnt = mc.MachineCount; //重新計算的話從0開始
-                            newDetail.EndCnt = mc.MachineCount; //寫入endCnt
-                            newDetail.OkCnt = newDetail.EndCnt - newDetail.StartCnt;  //計算okCnt
-                            newDetail.Ncode = mc.Ncode; //延續未價動原因
-                            newDetail.Perno ="";
-                            newDetail.Status = "";
-                            newDetail.PlineId = "";
-                            db.WorkcommandDetailsTaps.Add(newDetail);
-                            db.SaveChanges();
-                            mc.WcdId = newDetail.Id.ToString();
+                            ////新增一筆明細
+                            //WorkcommandDetailsTap newDetail = new WorkcommandDetailsTap();
+                            //newDetail.Startdate= mc.Detail.Enddate;
+                            //newDetail.WorkcommandId = mc.WcId;
+                            //newDetail.MachineId = mc.MachineId;
+                            //newDetail.Eid1 = detail.Eid1;
+                            //newDetail.StartCnt = mc.MachineCount; //重新計算的話從0開始
+                            //newDetail.EndCnt = mc.MachineCount; //寫入endCnt
+                            //newDetail.OkCnt = newDetail.EndCnt - newDetail.StartCnt;  //計算okCnt
+                            //newDetail.Ncode = mc.Ncode; //延續未價動原因
+                            //newDetail.Perno ="";
+                            //newDetail.Status = "";
+                            //newDetail.PlineId = "";
+                            //db.WorkcommandDetailsTaps.Add(newDetail);
+                            //db.SaveChanges();
+                            //mc.WcdId = newDetail.Id.ToString();
                         }
                         else
                         {
@@ -492,13 +502,23 @@ namespace CopaCmd.Jobs
                 //連線正常才取值
                 if (counterStatus == "1")
                 {
-                    results.Add(new MachineCounter
+                    try
                     {
-                        NewPlcCount = int.Parse(data.Value.values.Values.First().ToString()),
-                        PlcKey = data.Value.id,
-                        Status = counterStatus,
-                        UpdateTime = data.Value.updateTime.ToDateTimeString(),
-                    });
+                        results.Add(new MachineCounter
+                        {
+                            NewPlcCount =  (int)decimal.Parse(data.Value.values.Values.First().ToString()),
+                            PlcKey = data.Value.id,
+                            Status = counterStatus,
+                            UpdateTime = data.Value.updateTime.ToDateTimeString(),
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error($"PLC機台 {plcKey} 轉換異常，{ex.Message}");
+                    }
+                    finally
+                    {
+                    }
                 }
                 else
                 {
