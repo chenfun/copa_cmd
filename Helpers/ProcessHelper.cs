@@ -13,12 +13,13 @@ namespace CopaCmd.Helpers
 
     public static class ProcessHelper
     {
-        public static async Task StartProcessAsync(string fileName)
+        public static async Task StartProcessAsync(string fileName, string paras = "")
         {
             Process process = new Process();
             try
             {
                 process.StartInfo.FileName = fileName;
+                if (!string.IsNullOrWhiteSpace(paras)) { process.StartInfo.Arguments = paras; }
                 process.StartInfo.UseShellExecute = false;
                 process.Start();
                 await process.WaitForExitAsync();
