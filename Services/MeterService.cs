@@ -18,10 +18,10 @@ namespace CopaCmd.Services
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public async Task CalcMeterDayReport(string fileName)
+        public async Task CalcMeterDayReport(string fileName, string paras)
         {
             Log.Information("=====START_產生電表日報記錄=====");
-            await Helpers.ProcessHelper.StartProcessAsync(fileName);
+            await Helpers.ProcessHelper.StartProcessAsync(fileName, paras);
         }
 
         /// <summary>
@@ -29,10 +29,10 @@ namespace CopaCmd.Services
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public async Task CalcMeterElectricReport(string fileName)
+        public async Task CalcMeterElectricReport(string fileName, string paras)
         {
             Log.Information("=====START_生產秏電計算記錄=====");
-            await Helpers.ProcessHelper.StartProcessAsync(fileName);
+            await Helpers.ProcessHelper.StartProcessAsync(fileName, paras);
         }
 
         /// <summary>

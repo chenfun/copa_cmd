@@ -43,7 +43,7 @@ namespace CopaCmd.Utils
         /// <param name="info">資訊</param>
         public static async Task StartService(JobInfo info, string paras = "")
         {
-            var meterService = new Services.MeterService();
+            //取得參數
             var settingParas = Helpers.JobHelper.ConvertParas(info.Paras);
             switch (info.Code)
             {
@@ -52,16 +52,18 @@ namespace CopaCmd.Utils
                     break;
 
                 case "J02":
-                    await meterService.GetMeterRecordLog(info.FileName);
+                    var getMeterService = new Services.MeterService();
+                    await getMeterService.GetMeterRecordLog(info.FileName);
                     break;
 
                 case "J03":
-                    var machineService = new Services.MachineService();
-                    await machineService.UpdateProduceTotalTime(settingParas);
+                    var upMachineService = new Services.MachineService();
+                    await upMachineService.UpdateProduceTotalTime(settingParas);
                     break;
 
                 case "J04":
-                    await meterService.CalcMeterDayReport(info.FileName);
+                    var cmMachineService = new Services.MeterService();
+                    await cmMachineService.CalcMeterDayReport(info.FileName, paras);
                     break;
 
                 case "J05":
@@ -70,12 +72,23 @@ namespace CopaCmd.Utils
                     break;
 
                 case "J06":
-                    var erpService = new Services.ErpTransferService();
-                    await erpService.Start(info.FileName);
+                    var erpTransferService = new Services.ErpTransferService();
+                    await erpTransferService.Start(info.FileName);
                     break;
 
                 case "J07":
-                    await meterService.CalcMeterElectricReport(info.FileName);
+                    var cmerMachineService = new Services.MeterService();
+                    await cmerMachineService.CalcMeterElectricReport(info.FileName, paras);
+                    break;
+
+                case "J11":
+                    var updateCustomersService = new Services.UpdateCustomersService();
+                    await updateCustomersService.Start(info);
+                    break;
+
+                case "J12":
+                    var updateCustomerOrdersService = new Services.UpdateCustomerOrdersService();
+                    await updateCustomerOrdersService.Start(info);
                     break;
 
                 default:

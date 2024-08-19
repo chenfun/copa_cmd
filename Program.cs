@@ -49,6 +49,7 @@ namespace CopaCmd
                    .WithParsed(async options =>
                    {
                        string code = options.Code;
+                       string paras = options.Paras;
 
                        if (!string.IsNullOrWhiteSpace(code))
                        {
@@ -58,7 +59,8 @@ namespace CopaCmd
                            if (jb !=null)
                            {
                                Log.Information($"=====執行 {jb.Jobinfo.Title}=====!");
-
+                               //若參數不是空值，則設定輸入之參數
+                               if (!string.IsNullOrWhiteSpace(paras)) jb.Jobinfo.Paras = paras;
                                //目前未實作
                                Task t = Utils.CopaUtil.StartService(jb.Jobinfo);
                                // 調整等待時間關閉
