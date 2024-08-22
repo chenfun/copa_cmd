@@ -430,6 +430,7 @@ namespace CopaCmd.Jobs
                         {
                             detail.EndCnt = mc.MachineCount;
                             detail.OkCnt = detail.EndCnt -  detail.StartCnt;
+                            detail.UpdateTime = DateTime.Now; //加入更新時間
                             db.SaveChanges();
                         }
                     }

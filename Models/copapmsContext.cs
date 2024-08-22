@@ -13,6 +13,7 @@ namespace CopaContext
         public virtual DbSet<AdjustMold> AdjustMolds { get; set; } = null!;
         public virtual DbSet<AvailableWorkNoMachine> AvailableWorkNoMachines { get; set; } = null!;
         public virtual DbSet<CopaWorkOrder> CopaWorkOrders { get; set; } = null!;
+        public virtual DbSet<CopaWorkOrderPowerinfo> CopaWorkOrderPowerinfos { get; set; } = null!;
         public virtual DbSet<DayPackage> DayPackages { get; set; } = null!;
         public virtual DbSet<DayPro> DayPros { get; set; } = null!;
         public virtual DbSet<DayProduct> DayProducts { get; set; } = null!;
@@ -313,6 +314,77 @@ namespace CopaContext
                     .HasComment("合併製令編號");
             });
 
+                    modelBuilder.Entity<CopaWorkOrderPowerinfo>(entity =>
+            {
+                entity.ToTable("copa_work_order_powerinfo");
+
+                entity.Property(e => e.Id)
+                    .HasColumnType("int(11) unsigned")
+                    .HasComment("序號");
+
+                entity.Property(e => e.CreateTime)
+                    .HasColumnType("timestamp")
+                    .ValueGeneratedOnAddOrUpdate()
+                    .HasColumnName("create_time")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                    .HasComment("建立時間");
+
+                entity.Property(e => e.DetailTotalCnt)
+                    .HasColumnType("int(11)")
+                    .HasColumnName("detail_total_cnt")
+                    .HasComment("明細總生產量");
+
+                entity.Property(e => e.EndTime)
+                    .HasColumnType("datetime")
+                    .HasColumnName("end_time")
+                    .HasComment("結束時間");
+
+                entity.Property(e => e.MachineName)
+                    .HasMaxLength(20)
+                    .HasColumnName("machine_name")
+                    .HasComment("機台名稱");
+
+                entity.Property(e => e.MeterName)
+                    .HasMaxLength(20)
+                    .HasColumnName("meter_name")
+                    .HasComment("電表名稱");
+
+                entity.Property(e => e.Note)
+                    .HasMaxLength(50)
+                    .HasColumnName("note")
+                    .HasComment("備註");
+
+                entity.Property(e => e.ProductName)
+                    .HasMaxLength(20)
+                    .HasColumnName("product_name")
+                    .HasComment("產品品號");
+
+                entity.Property(e => e.StartTime)
+                    .HasColumnType("datetime")
+                    .HasColumnName("start_time")
+                    .HasComment("開始時間");
+
+                entity.Property(e => e.TotalCnt)
+                    .HasColumnType("int(11)")
+                    .HasColumnName("total_cnt")
+                    .HasComment("總生產量");
+
+                entity.Property(e => e.TotalPowerConsumption)
+                    .HasMaxLength(20)
+                    .HasColumnName("total_power_consumption")
+                    .HasComment("總秏電量");
+
+                entity.Property(e => e.TotalProductionSecs)
+                    .HasColumnType("int(11)")
+                    .HasColumnName("total_production_secs")
+                    .HasComment("總生產秒數");
+
+                entity.Property(e => e.WorkNo)
+                    .HasMaxLength(20)
+                    .HasColumnName("work_no")
+                    .HasComment("製令編號");
+            });
+                    
             modelBuilder.Entity<DayPackage>(entity =>
             {
                 entity.HasNoKey();
@@ -3201,7 +3273,6 @@ namespace CopaContext
 
                 entity.Property(e => e.UpdateTime)
                     .HasColumnType("datetime")
-                    .ValueGeneratedOnAddOrUpdate()
                     .HasColumnName("update_time")
                     .HasComment("更新時間");
 
