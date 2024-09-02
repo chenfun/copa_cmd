@@ -9,6 +9,7 @@ using CopaCmd.Schedule;
 using CopaCmd.ViewModel.Config;
 using System.Linq.Expressions;
 using System.Xml.Linq;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace CopaCmd.Helpers
 {
@@ -186,7 +187,9 @@ namespace CopaCmd.Helpers
         public static async Task<bool> StartJobAsync(JobInfo info)
         {
             string name = info.No;
-            string expression = info.CronSchedule;
+            //修改是否為多個觸發器
+            List<string> expressions = info.CronSchedule.Split("||").ToList();
+
             Type type = Type.GetType(name);
 
             if (type == null || !typeof(IJob).IsAssignableFrom(type))
@@ -203,13 +206,26 @@ namespace CopaCmd.Helpers
                                        .UsingJobData(jobDataMap)
                                        .Build();
 
-            ITrigger trigger = TriggerBuilder.Create()
-                                              .WithIdentity(TriggerPerfix + name)
-                                              .StartNow()
-                                              .WithCronSchedule(expression).ForJob(detail)
-                                              .Build();
+            bool hasJob = false;
+            foreach (var exp in expressions)
+            {
+                ITrigger trigger = TriggerBuilder.Create()
+                                            .WithIdentity(TriggerPerfix + name + new Random().Next(1, 999))
+                                            .StartNow()
+                                            .WithCronSchedule(exp).ForJob(detail)
+                                            .Build();
 
-            await Scheduler.GetIntance().ScheduleJob(detail, trigger);
+                if (!hasJob)
+                {
+                    await Scheduler.GetIntance().ScheduleJob(detail, trigger);
+                }
+                else
+                {
+                    //因為已經加過Job了，不能再使用ScheduleJob(detail, trigger)
+                    await Scheduler.GetIntance().ScheduleJob(trigger);
+                }
+                hasJob = true;
+            }
             return true;
         }
 
