@@ -72,8 +72,9 @@ namespace CopaCmd.Utils
                     break;
 
                 case "J06":
-                    var erpTransferService = new Services.ErpTransferService();
-                    await erpTransferService.Start(info.FileName);
+                    var erpService = new Services.ErpTransferService();
+                    string startDate = string.IsNullOrWhiteSpace(paras) ? DateTime.Now.ToString("yyyy-MM-dd") : paras.Split('=')[1];
+                    await erpService.Start(startDate);
                     break;
 
                 case "J07":

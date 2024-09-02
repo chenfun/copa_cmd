@@ -62,7 +62,7 @@ namespace CopaCmd
                                //若參數不是空值，則設定輸入之參數
                                if (!string.IsNullOrWhiteSpace(paras)) jb.Jobinfo.Paras = paras;
                                //目前未實作
-                               Task t = Utils.CopaUtil.StartService(jb.Jobinfo);
+                               Task t = Utils.CopaUtil.StartService(jb.Jobinfo, paras);
                                // 調整等待時間關閉
                                t.Wait();
                                // 自動關閉控制台應用程序
