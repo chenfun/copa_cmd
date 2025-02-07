@@ -51,45 +51,50 @@ namespace CopaCmd.Utils
                     Log.Information($"===========未實作 {info.Code}===========!");
                     break;
 
-                case "J02":
+                case "J02": // 取得機台紀錄
                     var getMeterService = new Services.MeterService();
                     await getMeterService.GetMeterRecordLog(info.FileName);
                     break;
 
-                case "J03":
+                case "J03": // 更新機台生產總時間
                     var upMachineService = new Services.MachineService();
                     await upMachineService.UpdateProduceTotalTime(settingParas);
                     break;
 
-                case "J04":
+                case "J04": // 計算機台日報表
                     var cmMachineService = new Services.MeterService();
                     await cmMachineService.CalcMeterDayReport(info.FileName, paras);
                     break;
 
-                case "J05":
+                case "J05": // 清除Log紀錄
                     var logService = new Services.LogService();
                     await logService.ClearLogRecord(settingParas);
                     break;
 
-                case "J06":
+                case "J06": // Erp資料轉移
                     var erpService = new Services.ErpTransferService();
                     string startDate = string.IsNullOrWhiteSpace(paras) ? DateTime.Now.ToString("yyyy-MM-dd") : paras.Split('=')[1];
                     await erpService.Start(startDate);
                     break;
 
-                case "J07":
+                case "J07": // 更新機台狀態
                     var cmerMachineService = new Services.MeterService();
                     await cmerMachineService.CalcMeterElectricReport(info.FileName, paras);
                     break;
 
-                case "J11":
+                case "J11": // 更新客戶資料
                     var updateCustomersService = new Services.UpdateCustomersService();
                     await updateCustomersService.Start(info);
                     break;
 
-                case "J12":
+                case "J12": // 更新客戶訂單資料
                     var updateCustomerOrdersService = new Services.UpdateCustomerOrdersService();
                     await updateCustomerOrdersService.Start(info);
+                    break;
+
+                case "J13": // 成本分析
+                    var cs = new Services.CostWorkOrderService();
+                    await cs.Start(info);
                     break;
 
                 default:
