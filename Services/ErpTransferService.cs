@@ -27,8 +27,8 @@ namespace CopaCmd.Services
             var attnDb = new AttnErpContext();
 
             var erpDatas = attnDb.MfMos.Where(m =>
-                m.MoDd.Date == today ||
-                (m.ModifyDd.HasValue && m.ModifyDd.Value.Date == today));
+              (m.SysDate.HasValue && m.SysDate.Value.Date == today) ||
+              (m.ModifyDd.HasValue && m.ModifyDd.Value.Date == today));
 
             foreach (var erpData in erpDatas)
             {
@@ -85,9 +85,9 @@ namespace CopaCmd.Services
             await db.SaveChangesAsync();
 
             var erpTzDatas = attnDb.MfTzs
-                .Where(m => m.TzDd.Date == today ||
-                            (m.ModifyDd.HasValue && m.ModifyDd.Value.Date == today))
-                .Where(m => m.ZcNo == "A");
+                    .Where(m => (m.SysDate.HasValue && m.SysDate.Value.Date == today) ||
+                                (m.ModifyDd.HasValue && m.ModifyDd.Value.Date == today))
+                    .Where(m => m.ZcNo == "A");
             foreach (var wcErpData in erpTzDatas)
             {
                 var productModel =
