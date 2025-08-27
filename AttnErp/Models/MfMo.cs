@@ -18,7 +18,7 @@ namespace CopaCmd.AttnErp.Models
         public string? Unit { get; set; }
         public decimal? Qty { get; set; }
         public decimal? Qty1 { get; set; }
-        public DateTime NeedDd { get; set; }
+        public DateTime? NeedDd { get; set; }
         public string? Dep { get; set; }
         public string? CusNo { get; set; }
         public string? CloseId { get; set; }
@@ -121,8 +121,7 @@ namespace CopaCmd.AttnErp.Models
         public decimal? CstPrdMl { get; set; }
         public decimal? CstOutMl { get; set; }
         public decimal? CstMl { get; set; }
-        
-        public ICollection<MfTz> MfTzs { get; set; } = new List<MfTz>();
 
+        public ICollection<MfTz> MfTzs { get; set; } = new List<MfTz>();
     }
 }
