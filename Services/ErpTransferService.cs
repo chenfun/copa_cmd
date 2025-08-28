@@ -60,7 +60,11 @@ namespace CopaCmd.Services
                     {
                         workOrder = new CopaWorkOrder();
                         db.CopaWorkOrders.Add(workOrder);
-                        Log.Information($"製令編號：{erpData.MrpNo} 寫入");
+                        Log.Information($"製令編號：{erpData.MoNo} 寫入");
+                    }
+                    else
+                    {
+                        Log.Information($"製令編號：{erpData.MoNo} 資料修改");
                     }
 
                     var cust = attnDb.Custs.FirstOrDefault(c => c.CusNo == erpData.CusNo);
@@ -165,6 +169,10 @@ namespace CopaCmd.Services
                     workcommand = new Workcommand();
                     db.Workcommands.Add(workcommand);
                     Log.Information($"派工單號：{wcErpData.TzNo} 寫入");
+                }
+                else
+                {
+                    Log.Information($"派工單號：{wcErpData.TzNo} 資料修改");
                 }
 
                 workcommand.ErpTzDd = wcErpData.TzDd;
