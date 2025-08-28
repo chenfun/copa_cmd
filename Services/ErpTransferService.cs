@@ -95,6 +95,7 @@ namespace CopaCmd.Services
                     workOrder.DeliveryPlace = "";
                     workOrder.Packing = "";
                     workOrder.CreateTime = DateTime.Now;
+                    await db.SaveChangesAsync();
                 }
                 catch (Exception ex)
                 {
@@ -106,9 +107,9 @@ namespace CopaCmd.Services
                         Note =  $"製令匯入錯誤，資料格式匯入錯誤，製令編號：{erpData.MrpNo}",
                     });
                     Log.Information($"製令編號：{erpData.MrpNo} 寫入錯誤==>{ex.Message}");
+                    await db.SaveChangesAsync();
                 }
             }
-            await db.SaveChangesAsync();
 
             var erpTzDatas = attnDb.MfTzs
                     .Where(m => (m.SysDate.HasValue && m.SysDate.Value.Date == today) ||
