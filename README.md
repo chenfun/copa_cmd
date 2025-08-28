@@ -15,10 +15,10 @@
 
 ### 3.1 常駐排程模式（預設）
 
-直接執行程式，啟動常駐排程服務：dotnet run
+直接執行程式，啟動常駐排程服務：Copacmd.exe
 ### 3.2 指定排程代碼執行
 
-可用參數指定要執行的排程代碼與參數：dotnet run -- -c <排程代碼> [-p <參數內容>]
+可用參數指定要執行的排程代碼與參數：Copacmd.exe -- -c <排程代碼> [-p <參數內容>]
 #### 參數說明
 
 | 參數 | 必填 | 說明         |
@@ -28,16 +28,16 @@
 
 #### 範例
 # ERP資料轉移，指定特定日期
-dotnet run -- -c J06 -p "2024-06-01"
+Copacmd.exe -- -c J06 -p "2024-06-01"
 
 # 機台日報表，指定特定日期
-dotnet run -- -c J04 -p "startDate=2024-06-01"
+Copacmd.exe -- -c J04 -p "startDate=2024-06-01"
 
 # 取得機台紀錄（無參數）
-dotnet run -- -c J02
+Copacmd.exe -- -c J02
 
 # 清除Log紀錄（無參數）
-dotnet run -- -c J05
+Copacmd.exe -- -c J05
 ## 4. 支援的排程代碼
 
 | 代碼 | 功能說明 | 參數需求 | 日期格式 | 備註 |
@@ -58,18 +58,18 @@ dotnet run -- -c J05
 #### J06 (ERP資料轉移) - 必填日期參數
 - **參數格式**: 直接提供日期字串
 - **日期格式**: `yyyy-MM-dd`
-- **範例**: dotnet run -- -c J06 -p "2024-06-01"- **說明**: 取得指定日期的ERP製令、派工單資訊
+- **範例**: Copacmd.exe -- -c J06 -p "2024-06-01"- **說明**: 取得指定日期的ERP製令、派工單資訊
 
 #### J04 (計算機台日報表) - 可選日期參數
 - **參數格式**: `startDate=日期`
 - **日期格式**: `yyyy-MM-dd`
-- **範例**: dotnet run -- -c J04 -p "startDate=2024-06-01"
-dotnet run -- -c J04  # 使用當日日期
+- **範例**: Copacmd.exe -- -c J04 -p "startDate=2024-06-01"
+Copacmd.exe -- -c J04  # 使用當日日期
 #### J07 (更新機台狀態) - 可選日期參數
 - **參數格式**: `startDate=日期`
 - **日期格式**: `yyyy-MM-dd`
-- **範例**: dotnet run -- -c J07 -p "startDate=2024-06-01"
-dotnet run -- -c J07  # 使用當日日期
+- **範例**: Copacmd.exe -- -c J07 -p "startDate=2024-06-01"
+Copacmd.exe -- -c J07  # 使用當日日期
 ## 5. 設定說明
 
 - 請於 `appsettings.json` 設定資料庫連線字串與日誌等相關參數。
