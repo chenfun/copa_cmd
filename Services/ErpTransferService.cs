@@ -60,6 +60,7 @@ namespace CopaCmd.Services
                     {
                         workOrder = new CopaWorkOrder();
                         db.CopaWorkOrders.Add(workOrder);
+                        Log.Information($"製令編號：{erpData.MrpNo} 寫入");
                     }
 
                     var cust = attnDb.Custs.FirstOrDefault(c => c.CusNo == erpData.CusNo);
@@ -90,7 +91,6 @@ namespace CopaCmd.Services
                     workOrder.DeliveryPlace = "";
                     workOrder.Packing = "";
                     workOrder.CreateTime = DateTime.Now;
-                    Log.Information($"製令編號：{erpData.MrpNo} 寫入");
                 }
                 catch (Exception ex)
                 {
@@ -164,6 +164,7 @@ namespace CopaCmd.Services
                 {
                     workcommand = new Workcommand();
                     db.Workcommands.Add(workcommand);
+                    Log.Information($"派工單號：{wcErpData.TzNo} 寫入");
                 }
 
                 workcommand.ErpTzDd = wcErpData.TzDd;
